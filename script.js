@@ -32,28 +32,60 @@ nav.querySelectorAll("a").forEach(a => a.addEventListener("click", () => {
 }));
 
 // Contact form
-document.getElementById("contact-form").addEventListener("submit", event => {
+
+const contactForm = document.getElementById("contact-form");
+const formNote = document.getElementById("form-note");
+const submitButton = contactForm.querySelector('button[type="submit"]');
+
+contactForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  const data = new FormData(event.currentTarget);
+  const originalButtonText = submitButton.innerHTML;
 
-  const subject = encodeURIComponent(
-    `Website enquiry: ${data.get("service")}`
-  );
+  submitButton.disabled = true;
+  submitButton.textContent = "Sending enquiry...";
 
-  const body = encodeURIComponent(
-    `Name: ${data.get("name")}\n` +
-    `Email: ${data.get("email")}\n` +
-    `Service: ${data.get("service")}\n\n` +
-    `Project details:\n${data.get("message")}`
-  );
+  formNote.textContent = "Please wait while we submit your enquiry.";
+  formNote.style.display = "block";
 
-  if (!BUSINESS_EMAIL || BUSINESS_EMAIL === "YOUR_EMAIL@example.com") {
-    document.getElementById("form-note").textContent =
-      "Please configure the business email address in script.js.";
-    return;
+  try {
+    const formData = new FormData(contactForm);
+    const payload = Object.fromEntries(formData.entries());
+
+    const response = await fetch(
+      "https://api.web3forms.com/submit",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify(payload)
+      }
+    );
+
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      formNote.textContent =
+        "Thank you! Your enquiry has been submitted successfully. We will get back to you within 1–2 business days.";
+
+      formNote.style.color = "#16834a";
+      contactForm.reset();
+    } else {
+      throw new Error(result.message || "Submission failed.");
+    }
+
+  } catch (error) {
+    console.error("Contact form error:", error);
+
+    formNote.textContent =
+      "Sorry, we couldn't submit your enquiry. Please try again or contact us through WhatsApp.";
+
+    formNote.style.color = "#c0392b";
+
+  } finally {
+    submitButton.disabled = false;
+    submitButton.innerHTML = originalButtonText;
   }
-
-  window.location.href =
-    `mailto:${BUSINESS_EMAIL}?subject=${subject}&body=${body}`;
 });
