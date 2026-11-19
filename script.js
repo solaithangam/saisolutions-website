@@ -1,5 +1,5 @@
 // Replace these two values before publishing.
-const BUSINESS_EMAIL = "contact@sais.com";
+const BUSINESS_EMAIL = "solaithangam.ai@gmail.com";
 const WHATSAPP_NUMBER = "919789550081"; // Country code + number, digits only.
 
 document.getElementById("email-link").textContent = BUSINESS_EMAIL;
@@ -30,7 +30,7 @@ document.getElementById("contact-form").addEventListener("submit", event => {
   const body = encodeURIComponent(
     `Name: ${data.get("name")}\nEmail: ${data.get("email")}\nService: ${data.get("service")}\n\nProject details:\n${data.get("message")}`
   );
-  if (BUSINESS_EMAIL === "contact@sais.com") {
+  if (BUSINESS_EMAIL === "solaithangam.ai@gmail.com") {
     document.getElementById("form-note").textContent =
       "Website setup required: replace YOUR_EMAIL@example.com in script.js with your business email before publishing.";
     return;
